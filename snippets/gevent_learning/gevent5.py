@@ -1,27 +1,45 @@
+# coding=utf8
 import gevent
-import random
+import urllib2
+import time
+
+# def task(pid):
+#     """
+#     Some non-deterministic task
+#     """
+#     gevent.sleep(2)
+#     print('Task %s done' % pid)
+
 
 def task(pid):
-    """
-    Some non-deterministic task
-    """
-    gevent.sleep(2)
-    print('Task %s done' % pid)
+    url = 'http://www.163.com/'
+    # print('GET: %s' % url)
+    resp = urllib2.urlopen(url)
+    data = resp.read()
+    # print('%d bytes received from %s.' % (len(data), url))
+
 
 def synchronous():
-    for i in range(1,10):
+    for i in range(1, 100):
         task(i)
 
+
 def asynchronous():
-    threads = [gevent.spawn(task, i) for i in xrange(10)]
+    threads = [gevent.spawn(task, i) for i in xrange(100)]
     gevent.joinall(threads)
 
-print('Synchronous:')
+
+print('Synchronous:============================')
+start = int(time.time())
 synchronous()
+end = int(time.time())
+print '===============Synchronous-Finish: {} s==============='.format(str(end - start))
 
-print('Asynchronous:')
+print('Asynchronous:===========================')
+start = int(time.time())
 asynchronous()
-
+end = int(time.time())
+print '===============Asynchronous-Finish: {} s==============='.format(str(end - start))
 """
 上例中，在同步的部分，所有的task都同步的执行， 结果当每个task在执行时主流程被阻塞(主流程的执行暂时停住)。
 
